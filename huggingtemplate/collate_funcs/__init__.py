@@ -1,0 +1,1 @@
+import image_transform import build_transform_for_beit

@@ -1,0 +1,63 @@
+# Data Arguments
+DataArguments:
+ dataset_class: FaceMaskDataset
+ train_data_dir: standard.csv
+ augmented_data_dir:
+ - megage.csv
+ - allageface.csv
+ test_data_dir: ../input/data/eval/images/
+ submit_file_dir: ../input/data/eval/
+ submit_file_name: info.csv
+ augmentation: False
+ return_images: False
+ level: 1
+
+# TrainingArguments
+TrainingArguments:
+ trainer_class: Trainer
+ wandb_project: huggingface
+ report_to: wandb
+ run_name: renew-210830-1
+ output_dir: output
+ learning_rate: 3e-5
+ do_train: True
+ do_eval: True
+ evaluation_strategy: "steps"
+ per_device_train_batch_size: 128
+ per_device_eval_batch_size: 128
+ num_train_epochs: 3
+ eval_steps: 100
+ save_steps: 100
+ save_total_limit: 10
+ weight_decay: 0.01
+ warmup_steps: 100
+ load_best_model_at_end: True
+ metric_for_best_model: "f1"
+ logging_dir: "logs"
+ lr_scheduler_type: "linear"
+
+# Model Arguments
+ModelArguments:
+ architectures: DeiTForSingleHeadClassification
+ model_name_or_path: microsoft/beit-base-patch16-224-pt22k-ft22k
+ cache_dir: cache
+ transformers_version: 4.10.0.dev0
+ num_labels: 18
+ epsilon: 0.1
+ gamma: 0.1
+
+# Collate Arguments
+CollateArguments:
+ collate_fn: build_transform_for_beit
+ input_size: 224
+ reprob: 0.2
+ rand_ratio: 0.1
+ color_jitter: 0.4
+
+# Metric Arguments
+MetricArguments:
+ metric_fn: compute_metrics_level1
+
+# KnockKnock Arguments
+AlarmArguments:
+ alarm_type: none

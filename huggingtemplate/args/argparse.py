@@ -41,7 +41,19 @@ class HfArgumentParser(ArgumentParser):
         Alternative helper method that does not use `argparse` at all, instead loading a yaml file and populating the
         dataclass types.
         """
-        data = yaml.load(Path(yaml_file).read_text(), Loader=yaml.Loader)
+        # https://stackoverflow.com/questions/30458977/yaml-loads-5e-6-as-string-and-not-a-number
+        loader = yaml.SafeLoader
+        loader.add_implicit_resolver(
+            u'tag:yaml.org,2002:float',
+            re.compile(u'''^(?:
+             [-+]?(?:[0-9][0-9_]*)\\.[0-9_]*(?:[eE][-+]?[0-9]+)?
+            |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
+            |\\.[0-9_]+(?:[eE][-+][0-9]+)?
+            |[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\\.[0-9_]*
+            |[-+]?\\.(?:inf|Inf|INF)
+            |\\.(?:nan|NaN|NAN))$''', re.X),
+            list(u'-+0123456789.'))
+        data = yaml.load(Path(yaml_file).read_text(), Loader=loader)
         outputs = []
         for dtype in self.dataclass_types:
             keys = {f.name for f in dataclasses.fields(dtype) if f.init}

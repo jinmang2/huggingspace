@@ -85,6 +85,8 @@ def main():
         train_dataset += aug_dataset
 
     def model_init():
+        import transformers
+        transformers.logging.set_verbosity_warning()
         config = AutoConfig.from_pretrained(model_args.model_name_or_path)
         for key, value in asdict(model_args).items():
             setattr(config, key, value)
@@ -96,7 +98,7 @@ def main():
         )
         return model
 
-    trainer = trainer_class(
+    trainer = trainer_cls(
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
@@ -111,29 +113,29 @@ def main():
     trainer.model.save_pretrained(
         save_directory=os.path.join(training_args.output_dir, training_args.run_name),
     )
+    if training_args.do_predict:
+        test_dataset = dataset_cls.load(
+            data_args.test_data_dir,
+            is_train=False,
+            transform=eval_transform,
+            return_image=data_args.return_image,
+            level=data_args.level,
+        )
 
-    test_dataset = dataset_cls.load(
-        data_args.test_data_dir,
-        is_train=False,
-        transform=eval_transform,
-        return_image=data_args.return_image,
-        level=data_args.level,
-    )
+        predictions = trainer.predict(test_dataset=test_dataset)
+        preds = predictions.predictions
+        preds = preds.argmax(axis=-1)
 
-    predictions = trainer.predict(test_dataset=test_dataset)
-    preds = predictions.predictions
-    preds = preds.argmax(axis=-1)
+        test_dir = data_args.submit_file_dir
+        submission = pd.read_csv(os.path.join(test_dir, data_args.submit_file_name))
 
-    test_dir = data_args.submit_file_dir
-    submission = pd.read_csv(os.path.join(test_dir, data_args.submit_file_name))
+        file2label = dict(zip(test_dataset.total_imgs, preds.tolist()))
+        submission['ans'] = submission.ImageID.map(file2label)
 
-    file2label = dict(zip(test_dataset.total_imgs, preds.tolist()))
-    submission['ans'] = submission.ImageID.map(file2label)
-
-    submission.to_csv(
-        os.path.join(test_dir, "submission-" + training_args.run_name + ".csv"),
-        index=False
-    )
+        submission.to_csv(
+            os.path.join(test_dir, "submission-" + training_args.run_name + ".csv"),
+            index=False
+        )
 
 
 if __name__ == "__main__":

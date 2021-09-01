@@ -8,6 +8,7 @@ from transformers import AutoConfig
 
 from dataclasses import dataclass, field, asdict
 
+from huggingtemplate import HfArgumentParser
 from huggingtemplate.args import (
     FaceMaskDataArguments,
     FaceMaskTrainingArguments,
@@ -50,15 +51,14 @@ def main():
 
     dataset_cls = getattr(datasets, data_args.dataset_class)
     trainer_cls = getattr(trainers, training_args.trainer_class)
-    collate_fn = getattr(collate_funcs, collate_args.collatn_fn)
+    collate_fn = getattr(collate_funcs, collate_args.collate_fn)
     metric_fn = getattr(metrics, metric_args.metric_fn)
 
-    train_transform, eval_transform = collate_fn(transform_args)
+    train_transform, eval_transform = collate_fn(collate_args)
     if not data_args.augmentation:
         train_transform = eval_transform
 
-    # @TODO: argument parsing
-    dataset = data_cls.load(
+    dataset = dataset_cls.load(
         data_args.train_data_dir,
         is_train=True,
         transform=train_transform,
@@ -74,7 +74,7 @@ def main():
         eval_dataset = None
 
     for aug_data_path in data_args.augmented_data_dir:
-        aug_dataset = data_cls.load(
+        aug_dataset = dataset_cls.load(
             aug_data_path,
             is_train=True,
             transform=train_transform,
@@ -108,7 +108,6 @@ def main():
     if training_args.report_to == "wandb":
         wandb.finish()
 
-    # @TODO: 자동화
     trainer.model.save_pretrained(
         save_directory=os.path.join(training_args.output_dir, training_args.run_name),
     )

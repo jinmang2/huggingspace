@@ -1,4 +1,5 @@
 import torch
+from typing import Optional, Tuple
 from dataclasses import dataclass
 from transformers.file_utils import ModelOutput
 

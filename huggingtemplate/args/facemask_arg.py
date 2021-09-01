@@ -13,6 +13,7 @@ from .argparse import lambda_field
 
 @dataclass
 class FaceMaskDataArguments(DataArguments):
+    dataset_class: str = field(default="FaceMaskDataset")
     train_data_dir: str = field(default="new_standard.csv")
     augmented_data_dir: List[str] = lambda_field(default=[])
     test_data_dir: str = field(default="../input/data/eval/images/")
@@ -24,6 +25,7 @@ class FaceMaskDataArguments(DataArguments):
 
 @dataclass
 class FaceMaskTrainingArguments(TrainingArguments):
+    trainer_class: str = field(default="Trainer")
     wandb_project: str = field(default='ai-stage-face-mask')
     report_to: str = field(default='wandb')
     run_name: str = field(default='test')
@@ -48,6 +50,7 @@ class FaceMaskModelArguments(ModelArguments):
 
 @dataclass
 class FaceMaskCollateArguments(CollateArguments):
+    collate_fn: str = field(default='build_transform_for_beit')
     input_size: int = field(default=224)
     color_jitter: float = field(default=0.4)
     aa: str = field(default='rand-m9-mstd0.5-inc1')

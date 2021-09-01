@@ -6,6 +6,7 @@ import json
 import yaml
 from enum import Enum
 from pathlib import Path
+from dataclasses import dataclass, field
 from typing import Any, Iterable, List, NewType, Optional, Tuple, Union, Dict
 
 from transformers.hf_argparser import HfArgumentParser as ArgumentParser

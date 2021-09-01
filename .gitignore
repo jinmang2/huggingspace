@@ -9,6 +9,13 @@ __pycache__/
 
 # Data
 *.txt
+*.csv
+*.xlsx
+*.jpg
+*.png
+*.PNG
+input/*
+cache/*
 
 # Checkpoint
 *.pt

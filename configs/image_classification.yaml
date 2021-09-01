@@ -1,7 +1,7 @@
 # Data Arguments
 DataArguments:
  dataset_class: FaceMaskDataset
- train_data_dir: standard.csv
+ train_data_dir: new_standard.csv
  augmented_data_dir:
  - megage.csv
  - allageface.csv
@@ -11,6 +11,7 @@ DataArguments:
  augmentation: False
  return_images: False
  level: 1
+ is_valid: True
 
 # TrainingArguments
 TrainingArguments:
@@ -38,7 +39,7 @@ TrainingArguments:
 
 # Model Arguments
 ModelArguments:
- architectures: DeiTForSingleHeadClassification
+ architectures: BeitForSingleHeadClassification
  model_name_or_path: microsoft/beit-base-patch16-224-pt22k-ft22k
  cache_dir: cache
  transformers_version: 4.10.0.dev0
@@ -56,7 +57,7 @@ CollateArguments:
 
 # Metric Arguments
 MetricArguments:
- metric_fn: compute_metrics_level1
+ metric_fn: compute_metrics_mask_gender_age
 
 # KnockKnock Arguments
 AlarmArguments:

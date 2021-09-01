@@ -1,10 +1,10 @@
-from modeling_deit import (
+from .modeling_deit import (
     DeiTWithLabelSmoothing,
     DeiTForSingleHeadClassification,
     DeiTForMultiHeadClassification,
 )
 
-from modeling_beit import (
+from .modeling_beit import (
     BeitWithLabelSmoothing,
     BeitForSingleHeadClassification,
     BeitForMultiHeadClassification,
